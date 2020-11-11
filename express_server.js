@@ -19,67 +19,137 @@ function generateRandomString() {
   return result;
 }
 
-// database
+// url database
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-// login 
-app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+// users database
+const users = {
+  01: {
+    id: "03", 
+    email: "user1@example.com", 
+    password: "1234"
+  },
+ 02: {
+    id: "04", 
+    email: "user2@example.com", 
+    password: "5678"
+  }
+}
+
+
+
+
+
+
+// render actual website 
+app.get('/u/:shortURL', (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
 });
 
-//logout
-app.post('/logout', (req, res) => {
-  res.clearCookie('username');
-  res.redirect('/urls');
-});
-
-// Urls Database in json format
+// render json
 app.get('/urls.json', (req, res) => {
   res.json(urlDatabase);
 });
 
+// render all urls page
 app.get('/urls', (req, res) => {
-  const templateVars = { username: req.cookies['username'], urls: urlDatabase };
+  const templateVars = { user_id: req.cookies['user_id'], urls: urlDatabase };
   res.render('urls_index', templateVars);
 });
 
+// render new url submission page
 app.get('/urls/new', (req, res) => {
-  const templateVars = { username: req.cookies['username'], urls: urlDatabase };
+  const templateVars = { user_id: req.cookies['user_id'], urls: urlDatabase };
   res.render('urls_new', templateVars);
 });
 
-app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
+// render single url 
+app.get("/urls/:shortURL", (req, res) => {
+  const templateVars = { user_id: req.cookies['user_id'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  res.render("urls_show", templateVars);
+});
+
+// render register page
+app.get('/register', (req, res) => {
+  const templateVars = { user_id: req.cookies['user_id'], urls: urlDatabase };
+  res.render('register', templateVars);
+});
+
+
+
+
+
+
+
+// post new url
+app.post("/urls/new", (req, res) => {
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);  
 });
 
+// post register
+app.post('/register', (req, res) => {
+  const id = generateRandomString();
+  const email = req.body.email;
+  const password = req.body.password;
+
+  if (email.length === 0 || password.length === 0) {
+    return res.status(400).send('You need to re-enter a valid email and password.');
+  }
+
+  for (let user in users) {
+    if (users[user].email === email) {
+      return res.status(400).send('This email already exists.');
+    }
+  }
+
+  const user = { id, email, password };
+
+  users[id] = user;
+  res.cookie('user_id', users[id].id)
+  res.redirect('/urls');
+});
+
+// post delete
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
   delete urlDatabase[shortURL];
   res.redirect('/urls');
 });
 
+// post update
 app.post('/urls/:shortURL/update', (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
   res.redirect('/urls');
 });
 
-app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { username: req.cookies['username'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-  res.render("urls_show", templateVars);
+// post login
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
+  res.redirect('/urls');
 });
 
-// Get single url after a new url submission
-app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+// post logout
+app.post('/logout', (req, res) => {
+  res.clearCookie('user_id');
+  res.redirect('/urls');
 });
+
+
+
+
+
+
+
+
+
+
+
 
 // Listening on PORT 8080
 app.listen(PORT, () => {
