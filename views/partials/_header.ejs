@@ -8,22 +8,22 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class="nav-item nav-link" href="/register">Register</a>
       </div>
     </div>
     <% if (user_id) {%>
       <form method="POST" action="/logout" class="form-inline">
         <div class="form-group mx-sm-3 mb-2">
           <span class="navbar-text">
-            User: <%= user_id %>
+            Logged in as: <%= user_email %>
           </span>
         </div>
         <button type="submit" class="btn btn-primary mb-2">Logout</button>
       </form>
       <%} else {%>
-        <form method="POST" action="/login" class="form-inline">
-          <button type="submit" class="btn btn-primary mb-2">Login</button>
-        </form>
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="/register">Register</a>
+          <a class="nav-item nav-link" href="/login">Login</a>
+        </div>
       <%} %>
     
   </nav>

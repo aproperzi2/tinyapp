@@ -28,12 +28,12 @@ const urlDatabase = {
 // users database
 const users = {
   01: {
-    id: "03", 
+    id: "01", 
     email: "user1@example.com", 
     password: "1234"
   },
  02: {
-    id: "04", 
+    id: "02", 
     email: "user2@example.com", 
     password: "5678"
   }
@@ -57,29 +57,32 @@ app.get('/urls.json', (req, res) => {
 
 // render all urls page
 app.get('/urls', (req, res) => {
-  const templateVars = { user_id: req.cookies['user_id'], urls: urlDatabase };
+  const templateVars = { user_email: req.cookies['user_email'], user_id: req.cookies['user_id'], urls: urlDatabase };
   res.render('urls_index', templateVars);
 });
 
 // render new url submission page
 app.get('/urls/new', (req, res) => {
-  const templateVars = { user_id: req.cookies['user_id'], urls: urlDatabase };
+  const templateVars = { user_email: req.cookies['user_email'], user_id: req.cookies['user_id'], urls: urlDatabase };
   res.render('urls_new', templateVars);
 });
 
 // render single url 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { user_id: req.cookies['user_id'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  const templateVars = { user_email: req.cookies['user_email'], user_id: req.cookies['user_id'], shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
 });
 
 // render register page
 app.get('/register', (req, res) => {
-  const templateVars = { user_id: req.cookies['user_id'], urls: urlDatabase };
+  const templateVars = { user_email: req.cookies['user_email'], user_id: req.cookies['user_id'], urls: urlDatabase };
   res.render('register', templateVars);
 });
 
-
+app.get('/login', (req, res) => {
+  const templateVars = { user_email: req.cookies['user_email'], user_id: req.cookies['user_id'], urls: urlDatabase };
+  res.render('login', templateVars);
+});
 
 
 
@@ -115,6 +118,30 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+app.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  let user_id;
+  let user_email;
+
+  for (let user in users) {
+    if (users[user].email === email && users[user].password === password) {
+      user_id = users[user].id;
+      user_email = users[user].email;
+    }
+  }
+
+  if (user_id === undefined) {
+    return res.status(403).send('Your login information is not valid.')
+  }
+  
+  
+
+  res.cookie('user_id', user_id);
+  res.cookie('user_email', user_email);
+  res.redirect('/urls');
+});
+
 // post delete
 app.post('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
@@ -125,12 +152,6 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 // post update
 app.post('/urls/:shortURL/update', (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
-  res.redirect('/urls');
-});
-
-// post login
-app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
   res.redirect('/urls');
 });
 
