@@ -7,7 +7,9 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
+        <% if (user_id) {%>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <%} %>
       </div>
     </div>
     <% if (user_id) {%>

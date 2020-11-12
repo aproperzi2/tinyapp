@@ -30,19 +30,14 @@ const users = {
   01: {
     id: "01", 
     email: "user1@example.com", 
-    password: "1234"
+    password: "1234", 
   },
  02: {
     id: "02", 
     email: "user2@example.com", 
-    password: "5678"
+    password: "5678",
   }
 }
-
-
-
-
-
 
 // render actual website 
 app.get('/u/:shortURL', (req, res) => {
@@ -64,6 +59,13 @@ app.get('/urls', (req, res) => {
 // render new url submission page
 app.get('/urls/new', (req, res) => {
   const templateVars = { user_email: req.cookies['user_email'], user_id: req.cookies['user_id'], urls: urlDatabase };
+
+  const user_id = req.cookies['user_id'];
+  
+  if (!user_id) {
+    res.redirect('/login');
+  }
+
   res.render('urls_new', templateVars);
 });
 
@@ -79,6 +81,7 @@ app.get('/register', (req, res) => {
   res.render('register', templateVars);
 });
 
+// render login page
 app.get('/login', (req, res) => {
   const templateVars = { user_email: req.cookies['user_email'], user_id: req.cookies['user_id'], urls: urlDatabase };
   res.render('login', templateVars);
@@ -118,6 +121,7 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
+// post login
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -158,6 +162,7 @@ app.post('/urls/:shortURL/update', (req, res) => {
 // post logout
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
+  res.clearCookie('user_email');
   res.redirect('/urls');
 });
 
