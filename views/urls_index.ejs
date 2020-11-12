@@ -17,19 +17,17 @@
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
-          <% if (user_id) {%>
           <th scope="col">Update</th>
           <th scope="col">Delete</th>
-          <% } %>
         </tr>
       </thead>
       <tbody>
         <% for(let url in urls) { %>
           
             <tr>
+              <% if (urls[url].userID === user_id) {%>
               <td><a href="/urls/<%= url %>"><%= url %></a></td>
-              <td><%= urls[url] %></td>
-              <% if (user_id) {%>
+              <td><%= urls[url].longURL %></td>
               <td>
                 <form method="GET" action="/urls/<%= url %>">
                   <button class="btn btn-outline-primary">Update</button>
