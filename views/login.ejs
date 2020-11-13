@@ -11,20 +11,20 @@
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
+        <h5 class="card-title">Login</h5>
+        <p>Please login to start shortening URLs!</p>
       </div>
-    <%if (user_id) {%>
     <div class="card-footer text-muted">
-      <form class="form-inline d-flex justify-content-center" action="/urls/<%= shortURL %>/update" method="POST">
+      <form class="d-flex justify-content-center" action="/login" method="POST">
         <div class="form-group mb-2">
-          <label for="longURL">Update this URL:</label>
-          <input class="form-control" type="text" name="longURL" placeholder="" style="width: 300px; margin: 1em">
+          <label for="email">Enter email:</label>
+          <input class="form-control" type="email" name="email" placeholder="" style="width: 300px; margin: 1em">
+          <label for="email">Enter password:</label>
+          <input class="form-control" type="password" name="password" placeholder="" style="width: 300px; margin: 1em">
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </form>
     </div>
-    <%}%>
   </div>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
