@@ -4,8 +4,12 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Home page with no user logged in"](http://docs/urls.png)
-!["screenshot description"](http://docs/urls_show)
+!["Home page with no user logged in"](https://github.com/aproperzi2/tinyapp/blob/feature/user-registration/docs/urls.png)
+!["Registration Page"](https://github.com/aproperzi2/tinyapp/blob/feature/user-registration/docs/urls_register.png)
+!["Login Page"](https://github.com/aproperzi2/tinyapp/blob/feature/user-registration/docs/urls_login.png)
+!["Create Url Page"](https://github.com/aproperzi2/tinyapp/blob/feature/user-registration/docs/urls_create.png)
+!["Show Url Page"](https://github.com/aproperzi2/tinyapp/blob/feature/user-registration/docs/urls_show.png)
+!["Edit/Delete Index Page"](https://github.com/aproperzi2/tinyapp/blob/feature/user-registration/docs/urls_index.png)
 
 ## Dependencies
 
