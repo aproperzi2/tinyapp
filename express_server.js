@@ -46,7 +46,7 @@ const users = {
   },
  02: {
     id: "02", 
-    email: "user2@example.com", 
+    email: "123@123.com", 
     password: "5678",
   }
 }
@@ -57,28 +57,44 @@ const users = {
 
 // render actual website 
 app.get('/u/:shortURL', (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL].longURL;
-  res.redirect(longURL);
-});
 
-// render json
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
+  const shortURL = req.params.shortURL;
+  
+  if (urlDatabase[shortURL] === undefined) {
+    res.status(403).send('Error: This short URL does not exist.');
+  }
+
+  const longURL = urlDatabase[shortURL].longURL;
+
+  res.redirect(longURL);
+
 });
 
 // render all urls page as home page
 app.get('/', (req, res) => {
-  const templateVars = { user_email: req.session.user_id, user_id: req.session.user_id, urls: urlDatabase };
-
+  
   const user_id = req.session['user_id'];
 
+  if (!user_id) {
+    res.redirect('login');
+  }
+
+  const templateVars = { user_email: req.session.user_id, user_id: req.session.user_id, urls: urlDatabase };
+
   res.render('urls_index', templateVars);
+
 });
 
 // render all urls page 
 app.get('/urls', (req, res) => {
-  const templateVars = { user_email: req.session.user_email, user_id: req.session.user_id, urls: urlDatabase };
+  const user_id = req.session['user_id'];
 
+  if (!user_id) {
+    res.status(403).send('Error: Please login to see URLS.');
+  }
+
+  const templateVars = { user_email: req.session.user_email, user_id: req.session.user_id, urls: urlDatabase };
+  
   res.render('urls_index', templateVars);
 });
 
@@ -90,16 +106,33 @@ app.get('/urls/new', (req, res) => {
   
   if (!user_id) {
     return res.status(403).send('Error: Please register/sign in to TinyApp to start creating URLs.');
-  }
+  } 
 
   res.render('urls_new', templateVars);
 });
 
 // render single url 
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { user_email: req.session.user_email, user_id: req.session.user_id, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };
+
+  const user_id = req.session.user_id;
+  const shortURL = req.params.shortURL;
+
+  if (urlDatabase[shortURL] === undefined) {
+    res.status(403).send('Error: This URL does not exist.');
+  }
+
+  if (!user_id) {
+    res.status(403).send('Error: You cannot view this page because you are not logged in.');
+  }
+
+  if (user_id !== urlDatabase[shortURL].userID) {
+    res.status(403).send('Error: This URL was not created by you, therefore you can not access it');
+  }
+
+  const templateVars = { user_email: req.session.user_email, user_id: req.session.user_id, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL };  
 
   res.render("urls_show", templateVars);
+  
 });
 
 // render register page
@@ -121,12 +154,15 @@ app.get('/login', (req, res) => {
 // post new url
 app.post("/urls/new", (req, res) => {
   let shortURL = generateRandomString();
+
   urlDatabase[shortURL] = {longURL: req.body.longURL, userID: req.session.user_id};
+
   res.redirect(`/urls/${shortURL}`);  
 });
 
 // post register
 app.post('/register', (req, res) => {
+
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
@@ -153,23 +189,29 @@ app.post('/register', (req, res) => {
 
 // post login
 app.post('/login', (req, res) => {
+
   const email = req.body.email;
   const password = req.body.password;
+
+  if (email.length === 0 || password.length === 0) {
+    return res.status(403).send('Error: Please enter a valid email address and password.');
+  };
+
   let user_id;
   let user_email;
   let hashedPassword;
   const user = helpers.getUserByEmail(email, users);
+
+  if (!user) {
+    res.status(401).send('Error: This is not a valid combination. Please try again.');
+  }
 
   hashedPassword = users[user].password;
 
   if (user && bcrypt.compareSync(password, hashedPassword)) {
     user_id = users[user].id;
     user_email = users[user].email;
-  };
- 
-  if (user_id === undefined) {
-    return res.status(403).send('Your login information is not valid.')
-  };
+  } 
 
   req.session.user_id = user_id;
   req.session.user_email = user_email;
