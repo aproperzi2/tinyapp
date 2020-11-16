@@ -46,7 +46,7 @@ const users = {
   },
  02: {
     id: "02", 
-    email: "123@123.com", 
+    email: "user2@exmaple.com", 
     password: "5678",
   }
 }
